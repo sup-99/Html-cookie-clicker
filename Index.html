@@ -1,0 +1,1148 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookie Empire</title>
+
+  <style>
+    :root {
+      --bg: #000000;
+      --panel: #111111;
+      --panel-light: #202020;
+      --gold: #ffd166;
+      --cream: #f5f5f5;
+      --muted: #aaaaaa;
+      --border: #3b3b3b;
+      --button: #292929;
+      --danger: #d95d39;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 24px;
+      display: grid;
+      place-items: center;
+      color: var(--cream);
+      font-family: system-ui, sans-serif;
+      background:
+        radial-gradient(circle at top, var(--panel-light), transparent 40%),
+        linear-gradient(135deg, var(--bg), #000);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .game {
+      width: min(1150px, 100%);
+      min-height: 700px;
+      display: grid;
+      grid-template-columns: 1fr 410px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: color-mix(in srgb, var(--panel) 94%, transparent);
+      box-shadow: 0 25px 80px #0007;
+    }
+
+    .main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      color: var(--gold);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+    }
+
+    .subtitle {
+      margin: 0 0 28px;
+      color: var(--muted);
+    }
+
+    .score {
+      margin: 0;
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-weight: 800;
+      line-height: 1;
+      text-shadow: 0 4px #0005;
+    }
+
+    .per-second {
+      min-height: 24px;
+      margin: 12px 0 32px;
+      color: var(--gold);
+    }
+
+    .cookie-wrap {
+      position: relative;
+    }
+
+    .cookie {
+      width: clamp(190px, 32vw, 270px);
+      aspect-ratio: 1;
+      border: 12px solid #a9572d;
+      border-radius: 50%;
+      cursor: pointer;
+      background:
+        radial-gradient(circle at 25% 25%, #d98643 0 4%, transparent 5%),
+        radial-gradient(circle at 65% 20%, #713319 0 4%, transparent 5%),
+        radial-gradient(circle at 75% 60%, #6d301c 0 5%, transparent 6%),
+        radial-gradient(circle at 35% 72%, #74351c 0 5%, transparent 6%),
+        radial-gradient(circle at 50% 45%, #843d20 0 4%, transparent 5%),
+        radial-gradient(circle at 35% 35%, #d98540, #a8522b 75%);
+      box-shadow:
+        inset -15px -18px #531d0d47,
+        inset 12px 10px #ffc57533,
+        0 18px #612c1c,
+        0 25px 35px #00000059;
+      transition: 0.08s ease;
+    }
+
+    .cookie:hover {
+      filter: brightness(1.1);
+    }
+
+    .cookie.pressed {
+      transform: translateY(8px) scale(0.96);
+    }
+
+    .floating-number {
+      position: absolute;
+      pointer-events: none;
+      color: var(--gold);
+      font-size: 1.5rem;
+      font-weight: 800;
+      animation: float-up 0.9s ease-out forwards;
+    }
+
+    @keyframes float-up {
+      from {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+      }
+
+      to {
+        opacity: 0;
+        transform: translate(-50%, -90px) scale(1.25);
+      }
+    }
+
+    .shop {
+      max-height: 100vh;
+      overflow-y: auto;
+      padding: 28px;
+      background: #0003;
+      border-left: 1px solid var(--border);
+    }
+
+    h2,
+    h3 {
+      color: var(--gold);
+    }
+
+    h2 {
+      margin: 0 0 18px;
+    }
+
+    h3 {
+      margin: 0 0 12px;
+    }
+
+    .section {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .upgrade,
+    .theme-button {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      color: var(--cream);
+      text-align: left;
+      background: var(--panel);
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .upgrade:hover:not(:disabled),
+    .theme-button:hover:not(:disabled) {
+      border-color: var(--gold);
+      background: var(--panel-light);
+      transform: translateY(-2px);
+    }
+
+    button:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+    }
+
+    .upgrade-icon,
+    .theme-icon {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--button);
+      font-size: 1.5rem;
+    }
+
+    .upgrade-name {
+      display: block;
+      font-weight: 800;
+    }
+
+    .upgrade-info {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .upgrade-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .owned-badge {
+      min-width: 34px;
+      padding: 5px 7px;
+      border-radius: 999px;
+      background: rgba(255, 209, 102, 0.12);
+      color: var(--gold);
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1;
+    }
+
+    .upgrade-cost {
+      color: var(--gold);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .casino-description {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .casino-input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--cream);
+      background: var(--panel);
+      font: inherit;
+    }
+
+    .casino-button {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 12px;
+      border: 1px solid var(--gold);
+      border-radius: 10px;
+      color: var(--gold);
+      background: var(--panel);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .casino-button:hover:not(:disabled) {
+      background: var(--panel-light);
+    }
+
+    .casino-result {
+      min-height: 22px;
+      margin: 8px 0 0;
+      color: var(--gold);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .stats {
+      display: grid;
+      gap: 8px;
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .stat strong {
+      color: var(--cream);
+    }
+
+    .prestige,
+    .reset {
+      width: 100%;
+      margin-top: 14px;
+      padding: 11px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .prestige {
+      border: 1px solid #b8892e;
+      color: var(--gold);
+      background: #ffd16614;
+    }
+
+    .reset {
+      border: 1px solid var(--danger);
+      color: #f3b09b;
+      background: transparent;
+    }
+
+    .prestige:hover:not(:disabled) {
+      background: #ffd16633;
+    }
+
+    .reset:hover {
+      background: #d95d3926;
+    }
+
+    .bottom-disclaimer {
+      position: relative;
+      width: 100%;
+      margin-top: 12px;
+      padding-top: 10px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.7rem;
+      opacity: 0.85;
+      letter-spacing: 0.02em;
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 0;
+      }
+
+      .game {
+        min-height: 100vh;
+        grid-template-columns: 1fr;
+        border: 0;
+        border-radius: 0;
+      }
+
+      .shop {
+        max-height: none;
+        border-top: 1px solid var(--border);
+        border-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="game">
+    <section class="main">
+      <h1>Cookie Empire</h1>
+      <p class="subtitle">Bake cookies. Buy upgrades. Rule the oven.</p>
+
+      <p id="score" class="score">0</p>
+      <p id="perSecond" class="per-second">0 cookies per second</p>
+
+      <div id="cookieWrap" class="cookie-wrap">
+        <button id="cookie" class="cookie" aria-label="Bake a cookie"></button>
+      </div>
+    </section>
+
+    <aside class="shop">
+      <h2>Bakery Upgrades</h2>
+      <div id="upgradeList"></div>
+
+      <section class="section">
+        <h3>🎰 Cookie Casino</h3>
+
+        <p class="casino-description">
+          Enter a wager, then choose a game. You cannot wager more cookies
+          than you currently own.
+        </p>
+
+        <input
+          id="wagerAmount"
+          class="casino-input"
+          type="number"
+          min="1"
+          step="1"
+          placeholder="Enter cookie wager"
+        >
+
+        <button id="doubleGame" class="casino-button">
+          50% chance: Double Wager
+        </button>
+
+        <button id="tenXGame" class="casino-button">
+          10% chance: Win 10× Wager
+        </button>
+
+        <button id="hundredXGame" class="casino-button">
+          1% chance: Win 100× Wager
+        </button>
+
+        <p id="casinoResult" class="casino-result"></p>
+      </section>
+
+      <section class="section">
+        <h3>🎨 Themes</h3>
+        <p class="casino-description">
+          Dark is free. Buy the Brown theme for 3,000 cookies.
+        </p>
+        <div id="themeList"></div>
+      </section>
+
+      <div class="stats">
+        <div class="stat">
+          <span>Total baked</span>
+          <strong id="totalBaked">0</strong>
+        </div>
+
+        <div class="stat">
+          <span>Cookies per click</span>
+          <strong id="perClick">1</strong>
+        </div>
+
+        <div class="stat">
+          <span>Upgrades owned</span>
+          <strong id="upgradeCount">0</strong>
+        </div>
+
+        <div class="stat">
+          <span>Prestige level</span>
+          <strong id="prestigeLevel">0</strong>
+        </div>
+
+        <div class="stat">
+          <span>Permanent multiplier</span>
+          <strong id="prestigeMultiplier">x1.00</strong>
+        </div>
+
+        <div class="stat">
+          <span>Current theme</span>
+          <strong id="currentTheme">Dark</strong>
+        </div>
+      </div>
+
+      <button id="prestige" class="prestige" disabled>
+        Prestige at 1,000,000 cookies
+      </button>
+
+      <button id="reset" class="reset">
+        Reset game
+      </button>
+
+      <div class="bottom-disclaimer">Made by GitHub Copilot</div>
+    </aside>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "cookie-empire-save";
+    const PRESTIGE_TARGET = 1000000;
+
+    let audioContext = null;
+
+    const themes = {
+      dark: {
+        name: "Dark",
+        icon: "🌑",
+        cost: 0,
+        colors: {
+          bg: "#000000",
+          panel: "#111111",
+          panelLight: "#202020",
+          gold: "#ffd166",
+          cream: "#f5f5f5",
+          muted: "#aaaaaa",
+          border: "#3b3b3b",
+          button: "#292929",
+          danger: "#d95d39"
+        }
+      },
+
+      brown: {
+        name: "Brown",
+        icon: "🟤",
+        cost: 3000,
+        colors: {
+          bg: "#24160f",
+          panel: "#3a2418",
+          panelLight: "#4b2f20",
+          gold: "#ffd166",
+          cream: "#fff4d6",
+          muted: "#c8a989",
+          border: "#70452b",
+          button: "#63351f",
+          danger: "#d95d39"
+        }
+      },
+
+      light: {
+        name: "Light",
+        icon: "☀️",
+        cost: 5000,
+        colors: {
+          bg: "#eadcc8",
+          panel: "#fff8ed",
+          panelLight: "#f3e4cf",
+          gold: "#9a5b00",
+          cream: "#352014",
+          muted: "#765d4a",
+          border: "#c99b68",
+          button: "#e3bd8c",
+          danger: "#b33d29"
+        }
+      },
+
+      red: {
+        name: "Red",
+        icon: "🔴",
+        cost: 10000,
+        colors: {
+          bg: "#260b0b",
+          panel: "#4a1717",
+          panelLight: "#682222",
+          gold: "#ffb3a7",
+          cream: "#fff0ed",
+          muted: "#d49a92",
+          border: "#963c36",
+          button: "#762525",
+          danger: "#e05245"
+        }
+      },
+
+      blue: {
+        name: "Blue",
+        icon: "🔵",
+        cost: 15000,
+        colors: {
+          bg: "#071525",
+          panel: "#102b46",
+          panelLight: "#19466d",
+          gold: "#8ed8ff",
+          cream: "#eaf8ff",
+          muted: "#9db9ce",
+          border: "#326b98",
+          button: "#20547b",
+          danger: "#db6d66"
+        }
+      },
+
+      yellow: {
+        name: "Yellow",
+        icon: "🟡",
+        cost: 20000,
+        colors: {
+          bg: "#302406",
+          panel: "#51400d",
+          panelLight: "#705916",
+          gold: "#fff083",
+          cream: "#fffbe0",
+          muted: "#d5c87c",
+          border: "#a18b23",
+          button: "#796717",
+          danger: "#df654d"
+        }
+      },
+
+      green: {
+        name: "Green",
+        icon: "🟢",
+        cost: 25000,
+        colors: {
+          bg: "#071e13",
+          panel: "#123b27",
+          panelLight: "#1c5a3a",
+          gold: "#a9f28b",
+          cream: "#edfff0",
+          muted: "#9dc5a7",
+          border: "#397c51",
+          button: "#28633f",
+          danger: "#df7560"
+        }
+      },
+
+      purple: {
+        name: "Purple",
+        icon: "🟣",
+        cost: 30000,
+        colors: {
+          bg: "#180a2d",
+          panel: "#321452",
+          panelLight: "#4d1f78",
+          gold: "#e0a7ff",
+          cream: "#f9ecff",
+          muted: "#c6a8d4",
+          border: "#78419b",
+          button: "#5c2b7c",
+          danger: "#e06b92"
+        }
+      }
+    };
+
+    const upgradeDefinitions = {
+      cursor: { name: "Grandma's Cursor", icon: "👆", cost: 15, cps: 1, clickPower: 0 },
+      grandma: { name: "Grandma", icon: "👵", cost: 100, cps: 8, clickPower: 0 },
+      oven: { name: "Second Oven", icon: "🔥", cost: 250, cps: 20, clickPower: 0 },
+      farm: { name: "Cookie Farm", icon: "🌾", cost: 500, cps: 40, clickPower: 0 },
+      rollingPin: { name: "Rolling Pin", icon: "🥖", cost: 200, cps: 0, clickPower: 1 },
+      sugarSprinkles: { name: "Sugar Sprinkles", icon: "✨", cost: 600, cps: 0, clickPower: 3 },
+      mixer: { name: "Dough Mixer", icon: "🥣", cost: 1800, cps: 0, clickPower: 12 },
+      chocolate: { name: "Chocolate Mine", icon: "🍫", cost: 1200, cps: 90, clickPower: 0 },
+      goldenSpoon: { name: "Golden Spoon", icon: "🥄", cost: 5500, cps: 0, clickPower: 35 },
+      factory: { name: "Cookie Factory", icon: "🏭", cost: 2500, cps: 200, clickPower: 0 },
+      robot: { name: "Cookie Robot", icon: "🤖", cost: 7500, cps: 650, clickPower: 0 },
+      cookiePress: { name: "Cookie Press", icon: "🧁", cost: 18000, cps: 0, clickPower: 100 },
+      laboratory: { name: "Cookie Laboratory", icon: "🧪", cost: 20000, cps: 2000, clickPower: 0 },
+      enchantedHands: { name: "Enchanted Hands", icon: "🪄", cost: 50000, cps: 0, clickPower: 300 },
+      spaceship: { name: "Cookie Spaceship", icon: "🚀", cost: 60000, cps: 6500, clickPower: 0 },
+      wizard: { name: "Cookie Wizard", icon: "🧙", cost: 200000, cps: 22000, clickPower: 0 },
+      cosmicPress: { name: "Cosmic Press", icon: "🌠", cost: 350000, cps: 0, clickPower: 2000 },
+      dimension: { name: "Cookie Dimension", icon: "🌌", cost: 750000, cps: 80000, clickPower: 0 },
+      empire: { name: "Cookie Empire", icon: "👑", cost: 3000000, cps: 300000, clickPower: 0 }
+    };
+
+    function createInitialUpgrades() {
+      return Object.fromEntries(
+        Object.entries(upgradeDefinitions).map(([key, upgrade]) => [
+          key,
+          { ...upgrade, owned: 0 }
+        ])
+      );
+    }
+
+    let state = {
+      cookies: 0,
+      totalBaked: 0,
+      perClick: 1,
+      prestigeLevel: 0,
+      prestigeMultiplier: 1,
+      currentTheme: "dark",
+      purchasedThemes: ["dark"],
+      upgrades: createInitialUpgrades()
+    };
+
+    function formatNumber(value) {
+      return Math.floor(value).toLocaleString();
+    }
+
+    function getUpgradeCount() {
+      return Object.values(state.upgrades)
+        .reduce((sum, upgrade) => sum + upgrade.owned, 0);
+    }
+
+    function getCps() {
+      const baseCps = Object.values(state.upgrades)
+        .reduce((sum, upgrade) => sum + upgrade.cps * upgrade.owned, 0);
+
+      return baseCps * state.prestigeMultiplier;
+    }
+
+    function getClickValue() {
+      const clickPower = Object.values(state.upgrades)
+        .reduce((sum, upgrade) => sum + upgrade.clickPower * upgrade.owned, 0);
+
+      return (state.perClick + clickPower) * state.prestigeMultiplier;
+    }
+
+    function getAudioContext() {
+      const AudioContextClass =
+        window.AudioContext || window.webkitAudioContext;
+
+      if (!AudioContextClass) return null;
+
+      if (!audioContext) {
+        audioContext = new AudioContextClass();
+      }
+
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+
+      return audioContext;
+    }
+
+    function playTone(
+      frequency,
+      duration = 0.12,
+      type = "sine",
+      volume = 0.08,
+      delay = 0
+    ) {
+      const context = getAudioContext();
+      if (!context) return;
+
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      const start = context.currentTime + delay;
+
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, start);
+
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(volume, start + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+
+      oscillator.start(start);
+      oscillator.stop(start + duration + 0.02);
+    }
+
+    function playCookieSound() {
+      playTone(180, 0.1, "triangle", 0.07);
+      playTone(90, 0.08, "sine", 0.035, 0.02);
+    }
+
+    function playUpgradeSound() {
+      playTone(392, 0.18, "sine", 0.08);
+      playTone(523.25, 0.18, "sine", 0.08, 0.08);
+      playTone(659.25, 0.25, "sine", 0.08, 0.16);
+    }
+
+    function playPrestigeSound() {
+      playTone(261.63, 0.2, "triangle", 0.08);
+      playTone(329.63, 0.2, "triangle", 0.08, 0.12);
+      playTone(392, 0.2, "triangle", 0.08, 0.24);
+      playTone(523.25, 0.5, "triangle", 0.1, 0.36);
+    }
+
+    function playResetSound() {
+      playTone(392, 0.18, "sawtooth", 0.06);
+      playTone(293.66, 0.18, "sawtooth", 0.06, 0.12);
+      playTone(196, 0.35, "sawtooth", 0.06, 0.24);
+    }
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function load() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return;
+
+      try {
+        const parsed = JSON.parse(saved);
+
+        state = {
+          ...state,
+          ...parsed,
+          upgrades: createInitialUpgrades()
+        };
+
+        for (const [key, savedUpgrade] of Object.entries(parsed.upgrades || {})) {
+          if (!state.upgrades[key]) continue;
+
+          state.upgrades[key].owned = Number(savedUpgrade.owned) || 0;
+          state.upgrades[key].cost =
+            Number(savedUpgrade.cost) || state.upgrades[key].cost;
+        }
+
+        if (!themes[state.currentTheme]) {
+          state.currentTheme = "dark";
+        }
+
+        if (!Array.isArray(state.purchasedThemes)) {
+          state.purchasedThemes = ["dark"];
+        }
+
+        if (!state.purchasedThemes.includes("dark")) {
+          state.purchasedThemes.push("dark");
+        }
+      } catch {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+
+    function camelToKebab(value) {
+      return value.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
+    }
+
+    function applyTheme() {
+      const theme = themes[state.currentTheme];
+
+      for (const [property, value] of Object.entries(theme.colors)) {
+        document.documentElement.style.setProperty(`--${camelToKebab(property)}`, value);
+      }
+
+      document.querySelector("#currentTheme").textContent = theme.name;
+    }
+
+    function createUpgradeButtons() {
+      const list = document.querySelector("#upgradeList");
+      list.innerHTML = "";
+
+      for (const [key, upgrade] of Object.entries(state.upgrades)) {
+        const button = document.createElement("button");
+
+        button.className = "upgrade";
+        button.dataset.upgrade = key;
+
+        button.innerHTML = `
+          <span class="upgrade-icon">${upgrade.icon}</span>
+          <span>
+            <span class="upgrade-name">${upgrade.name}</span>
+            <span class="upgrade-info"></span>
+          </span>
+          <span class="upgrade-right">
+            <span class="owned-badge">0</span>
+            <span class="upgrade-cost"></span>
+          </span>
+        `;
+
+        button.addEventListener("click", () => buyUpgrade(key));
+        list.appendChild(button);
+      }
+    }
+
+    function createThemeButtons() {
+      const list = document.querySelector("#themeList");
+      list.innerHTML = "";
+
+      for (const [key, theme] of Object.entries(themes)) {
+        const button = document.createElement("button");
+
+        button.className = "theme-button";
+        button.dataset.theme = key;
+
+        button.innerHTML = `
+          <span class="theme-icon">${theme.icon}</span>
+          <span>
+            <strong>${theme.name} Theme</strong>
+            <small class="upgrade-info"></small>
+          </span>
+          <span class="upgrade-cost"></span>
+        `;
+
+        button.addEventListener("click", () => buyOrSelectTheme(key));
+        list.appendChild(button);
+      }
+    }
+
+    function render() {
+      document.querySelector("#score").textContent =
+        formatNumber(state.cookies);
+
+      document.querySelector("#perSecond").textContent =
+        `${formatNumber(getCps())} cookies per second`;
+
+      document.querySelector("#totalBaked").textContent =
+        formatNumber(state.totalBaked);
+
+      document.querySelector("#perClick").textContent =
+        formatNumber(getClickValue());
+
+      document.querySelector("#upgradeCount").textContent =
+        formatNumber(getUpgradeCount());
+
+      document.querySelector("#prestigeLevel").textContent =
+        formatNumber(state.prestigeLevel);
+
+      document.querySelector("#prestigeMultiplier").textContent =
+        `x${state.prestigeMultiplier.toFixed(2)}`;
+
+      const prestigeButton = document.querySelector("#prestige");
+
+      prestigeButton.disabled = state.cookies < PRESTIGE_TARGET;
+      prestigeButton.textContent =
+        state.cookies >= PRESTIGE_TARGET
+          ? "Prestige now"
+          : "Prestige at 1,000,000 cookies";
+
+      document.querySelectorAll(".upgrade").forEach(button => {
+        const upgrade = state.upgrades[button.dataset.upgrade];
+        const cost = Math.floor(upgrade.cost);
+
+        button.disabled = state.cookies < cost;
+        button.querySelector(".upgrade-cost").textContent =
+          formatNumber(cost);
+
+        const ownedBadge = button.querySelector(".owned-badge");
+        ownedBadge.textContent = formatNumber(upgrade.owned);
+
+        let effect = "";
+
+        if (upgrade.clickPower > 0) {
+          effect += `+${formatNumber(upgrade.clickPower)} per click`;
+        }
+
+        if (upgrade.cps > 0) {
+          if (effect) effect += " and ";
+          effect += `+${formatNumber(upgrade.cps)} CPS`;
+        }
+
+        button.querySelector(".upgrade-info").textContent =
+          `${effect}`;
+      });
+
+      document.querySelectorAll(".theme-button").forEach(button => {
+        const key = button.dataset.theme;
+        const theme = themes[key];
+        const owned = state.purchasedThemes.includes(key);
+        const selected = state.currentTheme === key;
+
+        button.disabled = !owned && state.cookies < theme.cost;
+
+        button.querySelector(".upgrade-info").textContent =
+          selected
+            ? "Currently selected"
+            : owned
+              ? "Purchased · Click to use"
+              : `Buy ${theme.name} theme`;
+
+        button.querySelector(".upgrade-cost").textContent =
+          selected ? "Active" : owned ? "✓" : formatNumber(theme.cost);
+      });
+    }
+
+    function createFloatingNumber(amount, x, y) {
+      const floating = document.createElement("span");
+
+      floating.className = "floating-number";
+      floating.textContent = `+${formatNumber(amount)}`;
+      floating.style.left = `${x}px`;
+      floating.style.top = `${y}px`;
+
+      document.querySelector("#cookieWrap").appendChild(floating);
+
+      setTimeout(() => floating.remove(), 900);
+    }
+
+    function buyUpgrade(key) {
+      const upgrade = state.upgrades[key];
+      const cost = Math.floor(upgrade.cost);
+
+      if (state.cookies < cost) return;
+
+      state.cookies -= cost;
+      upgrade.owned += 1;
+      upgrade.cost *= 1.15;
+
+      playUpgradeSound();
+      render();
+      save();
+    }
+
+    function buyOrSelectTheme(key) {
+      const theme = themes[key];
+
+      if (state.purchasedThemes.includes(key)) {
+        state.currentTheme = key;
+        applyTheme();
+        render();
+        save();
+        return;
+      }
+
+      if (state.cookies < theme.cost) return;
+
+      state.cookies -= theme.cost;
+      state.purchasedThemes.push(key);
+      state.currentTheme = key;
+
+      applyTheme();
+      playUpgradeSound();
+      render();
+      save();
+    }
+
+    function getWager() {
+      const input = document.querySelector("#wagerAmount");
+      const wager = Math.floor(Number(input.value));
+
+      if (!Number.isFinite(wager) || wager < 1) {
+        return 0;
+      }
+
+      return wager;
+    }
+
+    function playCasinoGame(multiplier, winChance) {
+      const wager = getWager();
+      const result = document.querySelector("#casinoResult");
+
+      if (wager < 1) {
+        result.textContent = "Enter a valid wager first.";
+        return;
+      }
+
+      if (wager > state.cookies) {
+        result.textContent = "You do not have enough cookies for that wager.";
+        return;
+      }
+
+      state.cookies -= wager;
+
+      const won = Math.random() < winChance;
+
+      if (won) {
+        const winnings = wager * multiplier;
+        state.cookies += winnings;
+        state.totalBaked += winnings;
+
+        result.textContent =
+          `🎉 You won ${formatNumber(winnings)} cookies!`;
+
+        playUpgradeSound();
+      } else {
+        result.textContent =
+          `💥 You lost your ${formatNumber(wager)} cookie wager.`;
+
+        playResetSound();
+      }
+
+      document.querySelector("#wagerAmount").value = "";
+
+      render();
+      save();
+    }
+
+    function prestige() {
+      if (state.cookies < PRESTIGE_TARGET) return;
+
+      const owned = getUpgradeCount();
+
+      if (owned === 0) {
+        alert("Buy at least one upgrade before prestiging.");
+        return;
+      }
+
+      const bonus = owned * 0.001;
+
+      const confirmed = confirm(
+        `Prestige now?\n\n` +
+        `You will lose your cookies and bakery upgrades.\n` +
+        `Your purchased themes will remain unlocked.\n\n` +
+        `You will gain +${(bonus * 100).toFixed(1)}% permanently.\n` +
+        `New multiplier: x${(state.prestigeMultiplier + bonus).toFixed(3)}`
+      );
+
+      if (!confirmed) return;
+
+      state.cookies = 0;
+      state.upgrades = createInitialUpgrades();
+      state.prestigeMultiplier += bonus;
+      state.prestigeLevel += 1;
+
+      playPrestigeSound();
+      render();
+      save();
+    }
+
+    document.querySelector("#cookie").addEventListener("click", event => {
+      const amount = getClickValue();
+
+      state.cookies += amount;
+      state.totalBaked += amount;
+
+      const rect = document.querySelector("#cookieWrap").getBoundingClientRect();
+
+      createFloatingNumber(
+        amount,
+        event.clientX - rect.left,
+        event.clientY - rect.top
+      );
+
+      playCookieSound();
+
+      document.querySelector("#cookie").classList.add("pressed");
+
+      setTimeout(() => {
+        document.querySelector("#cookie").classList.remove("pressed");
+      }, 100);
+
+      render();
+      save();
+    });
+
+    document.querySelector("#doubleGame").addEventListener("click", () => {
+      playCasinoGame(2, 0.5);
+    });
+
+    document.querySelector("#tenXGame").addEventListener("click", () => {
+      playCasinoGame(10, 0.1);
+    });
+
+    document.querySelector("#hundredXGame").addEventListener("click", () => {
+      playCasinoGame(100, 0.01);
+    });
+
+    document.querySelector("#prestige").addEventListener("click", prestige);
+
+    document.querySelector("#reset").addEventListener("click", () => {
+      if (!confirm("Reset your bakery, themes, prestige, and all progress?")) {
+        return;
+      }
+
+      playResetSound();
+      localStorage.removeItem(STORAGE_KEY);
+
+      state = {
+        cookies: 0,
+        totalBaked: 0,
+        perClick: 1,
+        prestigeLevel: 0,
+        prestigeMultiplier: 1,
+        currentTheme: "dark",
+        purchasedThemes: ["dark"],
+        upgrades: createInitialUpgrades()
+      };
+
+      applyTheme();
+      document.querySelector("#casinoResult").textContent = "";
+      render();
+    });
+
+    setInterval(() => {
+      const cps = getCps();
+
+      if (cps > 0) {
+        state.cookies += cps;
+        state.totalBaked += cps;
+        render();
+        save();
+      }
+    }, 1000);
+
+    load();
+    applyTheme();
+    createUpgradeButtons();
+    createThemeButtons();
+    render();
+  </script>
+</body>
+</html>
