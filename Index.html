@@ -687,7 +687,7 @@
     }
 
     function getCps() {
-      const baseCps = Object.values(state.upgrades).reduce((sum, upgrade) => sum + upgrade.cps * upgrade.owned, 0);
+      const baseCps = Object.values(state.upgrades).reduce((sum, upgrade) => sum + (upgrade.cps || 0) * upgrade.owned, 0);
       let cpsValue = baseCps * state.prestigeMultiplier;
 
       for (const upgrade of Object.values(state.permanentUpgrades)) {
@@ -700,7 +700,7 @@
     }
 
     function getClickValue() {
-      const clickPower = Object.values(state.upgrades).reduce((sum, upgrade) => sum + upgrade.clickPower * upgrade.owned, 0);
+      const clickPower = Object.values(state.upgrades).reduce((sum, upgrade) => sum + (upgrade.clickPower || 0) * upgrade.owned, 0);
       let clickValue = (state.perClick + clickPower) * state.prestigeMultiplier;
 
       for (const upgrade of Object.values(state.permanentUpgrades)) {
@@ -777,28 +777,39 @@
       try {
         const parsed = JSON.parse(saved);
 
-        state = {
-          ...state,
-          ...parsed,
-          upgrades: createInitialUpgrades(),
-          permanentUpgrades: createInitialPermanentUpgrades()
-        };
+        state.cookies = Number(parsed.cookies) || 0;
+        state.totalBaked = Number(parsed.totalBaked) || 0;
+        state.perClick = Number(parsed.perClick) || 1;
+        state.prestigeLevel = Number(parsed.prestigeLevel) || 0;
+        state.prestigeMultiplier = Number(parsed.prestigeMultiplier) || 1;
+        state.currentTheme = parsed.currentTheme || "dark";
+        state.purchasedThemes = Array.isArray(parsed.purchasedThemes) ? parsed.purchasedThemes : ["dark"];
 
-        for (const [key, savedUpgrade] of Object.entries(parsed.upgrades || {})) {
-          if (!state.upgrades[key]) continue;
-          state.upgrades[key].owned = Number(savedUpgrade.owned) || 0;
-          state.upgrades[key].cost = Number(savedUpgrade.cost) || state.upgrades[key].cost;
+        // Restore upgrades with definitions
+        state.upgrades = createInitialUpgrades();
+        if (parsed.upgrades) {
+          for (const [key, savedUpgrade] of Object.entries(parsed.upgrades)) {
+            if (state.upgrades[key]) {
+              state.upgrades[key].owned = Number(savedUpgrade.owned) || 0;
+              state.upgrades[key].cost = Number(savedUpgrade.cost) || state.upgrades[key].cost;
+            }
+          }
         }
 
-        for (const [key, savedUpgrade] of Object.entries(parsed.permanentUpgrades || {})) {
-          if (!state.permanentUpgrades[key]) continue;
-          state.permanentUpgrades[key].owned = Number(savedUpgrade.owned) || 0;
+        // Restore permanent upgrades
+        state.permanentUpgrades = createInitialPermanentUpgrades();
+        if (parsed.permanentUpgrades) {
+          for (const [key, savedUpgrade] of Object.entries(parsed.permanentUpgrades)) {
+            if (state.permanentUpgrades[key]) {
+              state.permanentUpgrades[key].owned = Number(savedUpgrade.owned) || 0;
+            }
+          }
         }
 
         if (!themes[state.currentTheme]) state.currentTheme = "dark";
-        if (!Array.isArray(state.purchasedThemes)) state.purchasedThemes = ["dark"];
         if (!state.purchasedThemes.includes("dark")) state.purchasedThemes.push("dark");
-      } catch {
+      } catch (e) {
+        console.error("Failed to load save:", e);
         localStorage.removeItem(STORAGE_KEY);
       }
     }
