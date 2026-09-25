@@ -640,19 +640,19 @@
 
     function createInitialUpgrades() {
       return Object.fromEntries(
-        Object.entries(upgradeDefinitions).map(([key, upgrade]) => [{
-          ...upgrade,
-          owned: 0
-        }])
+        Object.entries(upgradeDefinitions).map(([key, upgrade]) => [
+          key,
+          { ...upgrade, owned: 0 }
+        ])
       );
     }
 
     function createInitialPermanentUpgrades() {
       return Object.fromEntries(
-        Object.entries(permanentUpgradeDefinitions).map(([key, upgrade]) => [{
-          ...upgrade,
-          owned: 0
-        }])
+        Object.entries(permanentUpgradeDefinitions).map(([key, upgrade]) => [
+          key,
+          { ...upgrade, owned: 0 }
+        ])
       );
     }
 
