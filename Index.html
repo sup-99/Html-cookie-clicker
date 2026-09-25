@@ -165,7 +165,8 @@
     }
 
     .upgrade,
-    .theme-button {
+    .theme-button,
+    .permanent-upgrade {
       width: 100%;
       display: grid;
       grid-template-columns: 48px 1fr auto;
@@ -180,6 +181,17 @@
       background: var(--panel);
       cursor: pointer;
       transition: 0.2s ease;
+    }
+
+    .permanent-upgrade {
+      border-color: #8b6914;
+      background: #ffd16608;
+    }
+
+    .permanent-upgrade:hover:not(:disabled) {
+      border-color: var(--gold);
+      background: #ffd16620;
+      transform: translateY(-2px);
     }
 
     .upgrade:hover:not(:disabled),
@@ -203,6 +215,11 @@
       border-radius: 12px;
       background: var(--button);
       font-size: 1.5rem;
+    }
+
+    .permanent-upgrade .upgrade-icon {
+      background: #8b6914;
+      font-size: 1.2rem;
     }
 
     .upgrade-name {
@@ -240,6 +257,13 @@
       color: var(--gold);
       font-weight: 800;
       white-space: nowrap;
+    }
+
+    .permanent-cost {
+      color: #e0a7ff;
+      font-weight: 800;
+      white-space: nowrap;
+      font-size: 0.9rem;
     }
 
     .casino-description {
@@ -384,6 +408,14 @@
     <aside class="shop">
       <h2>Bakery Upgrades</h2>
       <div id="upgradeList"></div>
+
+      <section class="section">
+        <h3>⭐ Upgrade Tree</h3>
+        <p class="casino-description">
+          Unlock permanent upgrades with prestige multiplier. These bonuses persist through prestige resets.
+        </p>
+        <div id="permanentUpgradeList"></div>
+      </section>
 
       <section class="section">
         <h3>🎰 Cookie Casino</h3>
@@ -635,9 +667,70 @@
       empire: { name: "Cookie Empire", icon: "👑", cost: 3000000, cps: 300000, clickPower: 0 }
     };
 
+    const permanentUpgradeDefinitions = {
+      efficientBaking: {
+        name: "Efficient Baking",
+        icon: "⚙️",
+        cost: 0.25,
+        effect: "Upgrades 10% cheaper",
+        modifier: (value) => value * 0.9
+      },
+      superiorClicks: {
+        name: "Superior Clicks",
+        icon: "👊",
+        cost: 0.5,
+        effect: "Clicks 15% more powerful",
+        modifier: (value) => value * 1.15
+      },
+      autoProduction: {
+        name: "Auto Production",
+        icon: "🔄",
+        cost: 1.0,
+        effect: "CPS 20% more efficient",
+        modifier: (value) => value * 1.2
+      },
+      priceBreak: {
+        name: "Price Break",
+        icon: "💰",
+        cost: 2.0,
+        effect: "All upgrades 15% cheaper",
+        modifier: (value) => value * 0.85
+      },
+      powerBurst: {
+        name: "Power Burst",
+        icon: "⚡",
+        cost: 3.5,
+        effect: "Clicks 25% more powerful",
+        modifier: (value) => value * 1.25
+      },
+      massProduction: {
+        name: "Mass Production",
+        icon: "🏢",
+        cost: 5.0,
+        effect: "CPS 30% more efficient",
+        modifier: (value) => value * 1.3
+      },
+      supremeDeal: {
+        name: "Supreme Deal",
+        icon: "🎁",
+        cost: 7.5,
+        effect: "Upgrades 20% cheaper",
+        modifier: (value) => value * 0.8
+      }
+    };
+
     function createInitialUpgrades() {
       return Object.fromEntries(
         Object.entries(upgradeDefinitions).map(([key, upgrade]) => [
+          key,
+          { ...upgrade, owned: 0 }
+        ])
+      );
+    }
+
+    function createInitialPermanentUpgrades() {
+      return Object.fromEntries(
+        Object.entries(permanentUpgradeDefinitions).map(([key, upgrade]) => [
           key,
           { ...upgrade, owned: 0 }
         ])
@@ -652,7 +745,8 @@
       prestigeMultiplier: 1,
       currentTheme: "dark",
       purchasedThemes: ["dark"],
-      upgrades: createInitialUpgrades()
+      upgrades: createInitialUpgrades(),
+      permanentUpgrades: createInitialPermanentUpgrades()
     };
 
     function formatNumber(value) {
@@ -664,18 +758,46 @@
         .reduce((sum, upgrade) => sum + upgrade.owned, 0);
     }
 
+    function getUpgradeCostModifier() {
+      let modifier = 1;
+      for (const upgrade of Object.values(state.permanentUpgrades)) {
+        if (upgrade.owned > 0 && upgrade.name.toLowerCase().includes("cheap")) {
+          modifier = upgrade.modifier(modifier);
+        }
+      }
+      return modifier;
+    }
+
     function getCps() {
       const baseCps = Object.values(state.upgrades)
         .reduce((sum, upgrade) => sum + upgrade.cps * upgrade.owned, 0);
 
-      return baseCps * state.prestigeMultiplier;
+      let cpsValue = baseCps * state.prestigeMultiplier;
+
+      // Apply permanent efficiency upgrades
+      for (const upgrade of Object.values(state.permanentUpgrades)) {
+        if (upgrade.owned > 0 && upgrade.name.includes("Production")) {
+          cpsValue = upgrade.modifier(cpsValue);
+        }
+      }
+
+      return cpsValue;
     }
 
     function getClickValue() {
       const clickPower = Object.values(state.upgrades)
         .reduce((sum, upgrade) => sum + upgrade.clickPower * upgrade.owned, 0);
 
-      return (state.perClick + clickPower) * state.prestigeMultiplier;
+      let clickValue = (state.perClick + clickPower) * state.prestigeMultiplier;
+
+      // Apply permanent click upgrades
+      for (const upgrade of Object.values(state.permanentUpgrades)) {
+        if (upgrade.owned > 0 && (upgrade.name.includes("Clicks") || upgrade.name.includes("Burst"))) {
+          clickValue = upgrade.modifier(clickValue);
+        }
+      }
+
+      return clickValue;
     }
 
     function getAudioContext() {
@@ -761,7 +883,8 @@
         state = {
           ...state,
           ...parsed,
-          upgrades: createInitialUpgrades()
+          upgrades: createInitialUpgrades(),
+          permanentUpgrades: createInitialPermanentUpgrades()
         };
 
         for (const [key, savedUpgrade] of Object.entries(parsed.upgrades || {})) {
@@ -770,6 +893,11 @@
           state.upgrades[key].owned = Number(savedUpgrade.owned) || 0;
           state.upgrades[key].cost =
             Number(savedUpgrade.cost) || state.upgrades[key].cost;
+        }
+
+        for (const [key, savedUpgrade] of Object.entries(parsed.permanentUpgrades || {})) {
+          if (!state.permanentUpgrades[key]) continue;
+          state.permanentUpgrades[key].owned = Number(savedUpgrade.owned) || 0;
         }
 
         if (!themes[state.currentTheme]) {
@@ -825,6 +953,35 @@
         `;
 
         button.addEventListener("click", () => buyUpgrade(key));
+        list.appendChild(button);
+      }
+    }
+
+    function createPermanentUpgradeButtons() {
+      const list = document.querySelector("#permanentUpgradeList");
+      list.innerHTML = "";
+
+      for (const [key, upgrade] of Object.entries(state.permanentUpgrades)) {
+        const button = document.createElement("button");
+
+        button.className = "permanent-upgrade";
+        button.dataset.permanent = key;
+
+        const ownedStatus = upgrade.owned > 0 ? "✓" : "";
+
+        button.innerHTML = `
+          <span class="upgrade-icon">${upgrade.icon}</span>
+          <span>
+            <span class="upgrade-name">${upgrade.name}</span>
+            <span class="upgrade-info">${upgrade.effect}</span>
+          </span>
+          <span class="upgrade-right">
+            ${ownedStatus ? `<span class="owned-badge">${ownedStatus}</span>` : ""}
+            <span class="permanent-cost"></span>
+          </span>
+        `;
+
+        button.addEventListener("click", () => buyPermanentUpgrade(key));
         list.appendChild(button);
       }
     }
@@ -885,7 +1042,8 @@
 
       document.querySelectorAll(".upgrade").forEach(button => {
         const upgrade = state.upgrades[button.dataset.upgrade];
-        const cost = Math.floor(upgrade.cost);
+        const costModifier = getUpgradeCostModifier();
+        const cost = Math.floor(upgrade.cost * costModifier);
 
         button.disabled = state.cookies < cost;
         button.querySelector(".upgrade-cost").textContent =
@@ -907,6 +1065,15 @@
 
         button.querySelector(".upgrade-info").textContent =
           `${effect}`;
+      });
+
+      document.querySelectorAll(".permanent-upgrade").forEach(button => {
+        const upgrade = state.permanentUpgrades[button.dataset.permanent];
+        const cost = upgrade.cost;
+
+        button.disabled = state.prestigeMultiplier < cost || upgrade.owned > 0;
+        button.querySelector(".permanent-cost").textContent =
+          upgrade.owned > 0 ? "Unlocked" : `${cost.toFixed(2)}⭐`;
       });
 
       document.querySelectorAll(".theme-button").forEach(button => {
@@ -944,13 +1111,28 @@
 
     function buyUpgrade(key) {
       const upgrade = state.upgrades[key];
-      const cost = Math.floor(upgrade.cost);
+      const costModifier = getUpgradeCostModifier();
+      const cost = Math.floor(upgrade.cost * costModifier);
 
       if (state.cookies < cost) return;
 
       state.cookies -= cost;
       upgrade.owned += 1;
       upgrade.cost *= 1.15;
+
+      playUpgradeSound();
+      render();
+      save();
+    }
+
+    function buyPermanentUpgrade(key) {
+      const upgrade = state.permanentUpgrades[key];
+      const cost = upgrade.cost;
+
+      if (state.prestigeMultiplier < cost || upgrade.owned > 0) return;
+
+      state.prestigeMultiplier -= cost;
+      upgrade.owned += 1;
 
       playUpgradeSound();
       render();
@@ -1000,8 +1182,8 @@
         return;
       }
 
-      if (wager > state.cookies) {
-        result.textContent = "You do not have enough cookies for that wager.";
+      if (state.cookies < wager) {
+        result.textContent = "Not enough cookies for this wager.";
         return;
       }
 
@@ -1010,23 +1192,14 @@
       const won = Math.random() < winChance;
 
       if (won) {
-        const winnings = wager * multiplier;
+        const winnings = Math.floor(wager * multiplier);
         state.cookies += winnings;
-        state.totalBaked += winnings;
-
-        result.textContent =
-          `🎉 You won ${formatNumber(winnings)} cookies!`;
-
-        playUpgradeSound();
+        result.textContent = `🎉 You won ${formatNumber(winnings)} cookies!`;
       } else {
-        result.textContent =
-          `💥 You lost your ${formatNumber(wager)} cookie wager.`;
-
-        playResetSound();
+        result.textContent = `😢 You lost ${formatNumber(wager)} cookies.`;
       }
 
-      document.querySelector("#wagerAmount").value = "";
-
+      state.totalBaked += Math.abs(state.cookies);
       render();
       save();
     }
@@ -1034,59 +1207,54 @@
     function prestige() {
       if (state.cookies < PRESTIGE_TARGET) return;
 
-      const owned = getUpgradeCount();
-
-      if (owned === 0) {
-        alert("Buy at least one upgrade before prestiging.");
-        return;
-      }
-
-      const bonus = owned * 0.001;
-
-      const confirmed = confirm(
-        `Prestige now?\n\n` +
-        `You will lose your cookies and bakery upgrades.\n` +
-        `Your purchased themes will remain unlocked.\n\n` +
-        `You will gain +${(bonus * 100).toFixed(1)}% permanently.\n` +
-        `New multiplier: x${(state.prestigeMultiplier + bonus).toFixed(3)}`
-      );
-
-      if (!confirmed) return;
+      const prestigeGain = Math.floor(state.cookies / PRESTIGE_TARGET) * 0.01;
+      state.prestigeLevel += 1;
+      state.prestigeMultiplier += prestigeGain;
 
       state.cookies = 0;
+      state.totalBaked = 0;
       state.upgrades = createInitialUpgrades();
-      state.prestigeMultiplier += bonus;
-      state.prestigeLevel += 1;
 
       playPrestigeSound();
       render();
       save();
     }
 
-    document.querySelector("#cookie").addEventListener("click", event => {
-      const amount = getClickValue();
+    function resetGame() {
+      if (!confirm("Are you sure? This will reset EVERYTHING. Permanent upgrades will be kept.")) {
+        return;
+      }
 
-      state.cookies += amount;
-      state.totalBaked += amount;
+      state.cookies = 0;
+      state.totalBaked = 0;
+      state.perClick = 1;
+      state.prestigeLevel = 0;
+      state.prestigeMultiplier = 1;
+      state.upgrades = createInitialUpgrades();
+      state.permanentUpgrades = createInitialPermanentUpgrades();
+      state.currentTheme = "dark";
+      state.purchasedThemes = ["dark"];
 
-      const rect = document.querySelector("#cookieWrap").getBoundingClientRect();
-
-      createFloatingNumber(
-        amount,
-        event.clientX - rect.left,
-        event.clientY - rect.top
-      );
-
-      playCookieSound();
-
-      document.querySelector("#cookie").classList.add("pressed");
-
-      setTimeout(() => {
-        document.querySelector("#cookie").classList.remove("pressed");
-      }, 100);
-
+      applyTheme();
+      playResetSound();
       render();
       save();
+    }
+
+    document.querySelector("#cookie").addEventListener("click", function (e) {
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      state.cookies += getClickValue();
+      state.totalBaked += getClickValue();
+
+      this.classList.add("pressed");
+      setTimeout(() => this.classList.remove("pressed"), 80);
+
+      createFloatingNumber(getClickValue(), x, y);
+      playCookieSound();
+      render();
     });
 
     document.querySelector("#doubleGame").addEventListener("click", () => {
@@ -1102,47 +1270,21 @@
     });
 
     document.querySelector("#prestige").addEventListener("click", prestige);
-
-    document.querySelector("#reset").addEventListener("click", () => {
-      if (!confirm("Reset your bakery, themes, prestige, and all progress?")) {
-        return;
-      }
-
-      playResetSound();
-      localStorage.removeItem(STORAGE_KEY);
-
-      state = {
-        cookies: 0,
-        totalBaked: 0,
-        perClick: 1,
-        prestigeLevel: 0,
-        prestigeMultiplier: 1,
-        currentTheme: "dark",
-        purchasedThemes: ["dark"],
-        upgrades: createInitialUpgrades()
-      };
-
-      applyTheme();
-      document.querySelector("#casinoResult").textContent = "";
-      render();
-    });
+    document.querySelector("#reset").addEventListener("click", resetGame);
 
     setInterval(() => {
-      const cps = getCps();
-
-      if (cps > 0) {
-        state.cookies += cps;
-        state.totalBaked += cps;
-        render();
-        save();
-      }
-    }, 1000);
+      state.cookies += getCps() / 10;
+      state.totalBaked += getCps() / 10;
+      render();
+    }, 100);
 
     load();
     applyTheme();
     createUpgradeButtons();
+    createPermanentUpgradeButtons();
     createThemeButtons();
     render();
   </script>
 </body>
+
 </html>
