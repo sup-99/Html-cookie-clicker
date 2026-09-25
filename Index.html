@@ -19,9 +19,7 @@
       --danger: #d95d39;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -83,9 +81,7 @@
       color: var(--gold);
     }
 
-    .cookie-wrap {
-      position: relative;
-    }
+    .cookie-wrap { position: relative; }
 
     .cookie {
       width: clamp(190px, 32vw, 270px);
@@ -108,13 +104,8 @@
       transition: 0.08s ease;
     }
 
-    .cookie:hover {
-      filter: brightness(1.1);
-    }
-
-    .cookie.pressed {
-      transform: translateY(8px) scale(0.96);
-    }
+    .cookie:hover { filter: brightness(1.1); }
+    .cookie.pressed { transform: translateY(8px) scale(0.96); }
 
     .floating-number {
       position: absolute;
@@ -130,7 +121,6 @@
         opacity: 1;
         transform: translate(-50%, 0) scale(1);
       }
-
       to {
         opacity: 0;
         transform: translate(-50%, -90px) scale(1.25);
@@ -145,18 +135,9 @@
       border-left: 1px solid var(--border);
     }
 
-    h2,
-    h3 {
-      color: var(--gold);
-    }
-
-    h2 {
-      margin: 0 0 18px;
-    }
-
-    h3 {
-      margin: 0 0 12px;
-    }
+    h2, h3 { color: var(--gold); }
+    h2 { margin: 0 0 18px; }
+    h3 { margin: 0 0 12px; }
 
     .section {
       margin-top: 24px;
@@ -295,9 +276,7 @@
       font-weight: 700;
     }
 
-    .casino-button:hover:not(:disabled) {
-      background: var(--panel-light);
-    }
+    .casino-button:hover:not(:disabled) { background: var(--panel-light); }
 
     .casino-result {
       min-height: 22px;
@@ -324,9 +303,7 @@
       gap: 16px;
     }
 
-    .stat strong {
-      color: var(--cream);
-    }
+    .stat strong { color: var(--cream); }
 
     .prestige,
     .reset {
@@ -350,13 +327,8 @@
       background: transparent;
     }
 
-    .prestige:hover:not(:disabled) {
-      background: #ffd16633;
-    }
-
-    .reset:hover {
-      background: #d95d3926;
-    }
+    .prestige:hover:not(:disabled) { background: #ffd16633; }
+    .reset:hover { background: #d95d3926; }
 
     .bottom-disclaimer {
       position: relative;
@@ -371,9 +343,7 @@
     }
 
     @media (max-width: 760px) {
-      body {
-        padding: 0;
-      }
+      body { padding: 0; }
 
       .game {
         min-height: 100vh;
@@ -419,32 +389,16 @@
 
       <section class="section">
         <h3>🎰 Cookie Casino</h3>
-
         <p class="casino-description">
           Enter a wager, then choose a game. You cannot wager more cookies
           than you currently own.
         </p>
 
-        <input
-          id="wagerAmount"
-          class="casino-input"
-          type="number"
-          min="1"
-          step="1"
-          placeholder="Enter cookie wager"
-        >
+        <input id="wagerAmount" class="casino-input" type="number" min="1" step="1" placeholder="Enter cookie wager">
 
-        <button id="doubleGame" class="casino-button">
-          50% chance: Double Wager
-        </button>
-
-        <button id="tenXGame" class="casino-button">
-          10% chance: Win 10× Wager
-        </button>
-
-        <button id="hundredXGame" class="casino-button">
-          1% chance: Win 100× Wager
-        </button>
+        <button id="doubleGame" class="casino-button">50% chance: Double Wager</button>
+        <button id="tenXGame" class="casino-button">10% chance: Win 10× Wager</button>
+        <button id="hundredXGame" class="casino-button">1% chance: Win 100× Wager</button>
 
         <p id="casinoResult" class="casino-result"></p>
       </section>
@@ -458,44 +412,16 @@
       </section>
 
       <div class="stats">
-        <div class="stat">
-          <span>Total baked</span>
-          <strong id="totalBaked">0</strong>
-        </div>
-
-        <div class="stat">
-          <span>Cookies per click</span>
-          <strong id="perClick">1</strong>
-        </div>
-
-        <div class="stat">
-          <span>Upgrades owned</span>
-          <strong id="upgradeCount">0</strong>
-        </div>
-
-        <div class="stat">
-          <span>Prestige level</span>
-          <strong id="prestigeLevel">0</strong>
-        </div>
-
-        <div class="stat">
-          <span>Permanent multiplier</span>
-          <strong id="prestigeMultiplier">x1.00</strong>
-        </div>
-
-        <div class="stat">
-          <span>Current theme</span>
-          <strong id="currentTheme">Dark</strong>
-        </div>
+        <div class="stat"><span>Total baked</span><strong id="totalBaked">0</strong></div>
+        <div class="stat"><span>Cookies per click</span><strong id="perClick">1</strong></div>
+        <div class="stat"><span>Upgrades owned</span><strong id="upgradeCount">0</strong></div>
+        <div class="stat"><span>Prestige level</span><strong id="prestigeLevel">0</strong></div>
+        <div class="stat"><span>Permanent multiplier</span><strong id="prestigeMultiplier">x1.00</strong></div>
+        <div class="stat"><span>Current theme</span><strong id="currentTheme">Dark</strong></div>
       </div>
 
-      <button id="prestige" class="prestige" disabled>
-        Prestige at 1,000,000 cookies
-      </button>
-
-      <button id="reset" class="reset">
-        Reset game
-      </button>
+      <button id="prestige" class="prestige" disabled>Prestige at 1,000,000 cookies</button>
+      <button id="reset" class="reset">Reset game</button>
 
       <div class="bottom-disclaimer">Made by GitHub Copilot</div>
     </aside>
@@ -524,7 +450,6 @@
           danger: "#d95d39"
         }
       },
-
       brown: {
         name: "Brown",
         icon: "🟤",
@@ -541,7 +466,6 @@
           danger: "#d95d39"
         }
       },
-
       light: {
         name: "Light",
         icon: "☀️",
@@ -558,7 +482,6 @@
           danger: "#b33d29"
         }
       },
-
       red: {
         name: "Red",
         icon: "🔴",
@@ -575,7 +498,6 @@
           danger: "#e05245"
         }
       },
-
       blue: {
         name: "Blue",
         icon: "🔵",
@@ -592,7 +514,6 @@
           danger: "#db6d66"
         }
       },
-
       yellow: {
         name: "Yellow",
         icon: "🟡",
@@ -609,7 +530,6 @@
           danger: "#df654d"
         }
       },
-
       green: {
         name: "Green",
         icon: "🟢",
@@ -626,7 +546,6 @@
           danger: "#df7560"
         }
       },
-
       purple: {
         name: "Purple",
         icon: "🟣",
@@ -721,19 +640,19 @@
 
     function createInitialUpgrades() {
       return Object.fromEntries(
-        Object.entries(upgradeDefinitions).map(([key, upgrade]) => [
-          key,
-          { ...upgrade, owned: 0 }
-        ])
+        Object.entries(upgradeDefinitions).map(([key, upgrade]) => [{
+          ...upgrade,
+          owned: 0
+        }])
       );
     }
 
     function createInitialPermanentUpgrades() {
       return Object.fromEntries(
-        Object.entries(permanentUpgradeDefinitions).map(([key, upgrade]) => [
-          key,
-          { ...upgrade, owned: 0 }
-        ])
+        Object.entries(permanentUpgradeDefinitions).map(([key, upgrade]) => [{
+          ...upgrade,
+          owned: 0
+        }])
       );
     }
 
@@ -754,8 +673,7 @@
     }
 
     function getUpgradeCount() {
-      return Object.values(state.upgrades)
-        .reduce((sum, upgrade) => sum + upgrade.owned, 0);
+      return Object.values(state.upgrades).reduce((sum, upgrade) => sum + upgrade.owned, 0);
     }
 
     function getUpgradeCostModifier() {
@@ -769,9 +687,7 @@
     }
 
     function getCps() {
-      const baseCps = Object.values(state.upgrades)
-        .reduce((sum, upgrade) => sum + upgrade.cps * upgrade.owned, 0);
-
+      const baseCps = Object.values(state.upgrades).reduce((sum, upgrade) => sum + upgrade.cps * upgrade.owned, 0);
       let cpsValue = baseCps * state.prestigeMultiplier;
 
       for (const upgrade of Object.values(state.permanentUpgrades)) {
@@ -784,9 +700,7 @@
     }
 
     function getClickValue() {
-      const clickPower = Object.values(state.upgrades)
-        .reduce((sum, upgrade) => sum + upgrade.clickPower * upgrade.owned, 0);
-
+      const clickPower = Object.values(state.upgrades).reduce((sum, upgrade) => sum + upgrade.clickPower * upgrade.owned, 0);
       let clickValue = (state.perClick + clickPower) * state.prestigeMultiplier;
 
       for (const upgrade of Object.values(state.permanentUpgrades)) {
@@ -799,29 +713,14 @@
     }
 
     function getAudioContext() {
-      const AudioContextClass =
-        window.AudioContext || window.webkitAudioContext;
-
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
       if (!AudioContextClass) return null;
-
-      if (!audioContext) {
-        audioContext = new AudioContextClass();
-      }
-
-      if (audioContext.state === "suspended") {
-        audioContext.resume();
-      }
-
+      if (!audioContext) audioContext = new AudioContextClass();
+      if (audioContext.state === "suspended") audioContext.resume();
       return audioContext;
     }
 
-    function playTone(
-      frequency,
-      duration = 0.12,
-      type = "sine",
-      volume = 0.08,
-      delay = 0
-    ) {
+    function playTone(frequency, duration = 0.12, type = "sine", volume = 0.08, delay = 0) {
       const context = getAudioContext();
       if (!context) return;
 
@@ -887,7 +786,6 @@
 
         for (const [key, savedUpgrade] of Object.entries(parsed.upgrades || {})) {
           if (!state.upgrades[key]) continue;
-
           state.upgrades[key].owned = Number(savedUpgrade.owned) || 0;
           state.upgrades[key].cost = Number(savedUpgrade.cost) || state.upgrades[key].cost;
         }
@@ -897,17 +795,9 @@
           state.permanentUpgrades[key].owned = Number(savedUpgrade.owned) || 0;
         }
 
-        if (!themes[state.currentTheme]) {
-          state.currentTheme = "dark";
-        }
-
-        if (!Array.isArray(state.purchasedThemes)) {
-          state.purchasedThemes = ["dark"];
-        }
-
-        if (!state.purchasedThemes.includes("dark")) {
-          state.purchasedThemes.push("dark");
-        }
+        if (!themes[state.currentTheme]) state.currentTheme = "dark";
+        if (!Array.isArray(state.purchasedThemes)) state.purchasedThemes = ["dark"];
+        if (!state.purchasedThemes.includes("dark")) state.purchasedThemes.push("dark");
       } catch {
         localStorage.removeItem(STORAGE_KEY);
       }
@@ -919,11 +809,9 @@
 
     function applyTheme() {
       const theme = themes[state.currentTheme];
-
       for (const [property, value] of Object.entries(theme.colors)) {
         document.documentElement.style.setProperty(`--${camelToKebab(property)}`, value);
       }
-
       document.querySelector("#currentTheme").textContent = theme.name;
     }
 
@@ -933,10 +821,8 @@
 
       for (const [key, upgrade] of Object.entries(state.upgrades)) {
         const button = document.createElement("button");
-
         button.className = "upgrade";
         button.dataset.upgrade = key;
-
         button.innerHTML = `
           <span class="upgrade-icon">${upgrade.icon}</span>
           <span>
@@ -948,7 +834,6 @@
             <span class="upgrade-cost"></span>
           </span>
         `;
-
         button.addEventListener("click", () => buyUpgrade(key));
         list.appendChild(button);
       }
@@ -960,12 +845,9 @@
 
       for (const [key, upgrade] of Object.entries(state.permanentUpgrades)) {
         const button = document.createElement("button");
-
         button.className = "permanent-upgrade";
         button.dataset.permanent = key;
-
         const ownedStatus = upgrade.owned > 0 ? "✓" : "";
-
         button.innerHTML = `
           <span class="upgrade-icon">${upgrade.icon}</span>
           <span>
@@ -977,7 +859,6 @@
             <span class="permanent-cost"></span>
           </span>
         `;
-
         button.addEventListener("click", () => buyPermanentUpgrade(key));
         list.appendChild(button);
       }
@@ -989,10 +870,8 @@
 
       for (const [key, theme] of Object.entries(themes)) {
         const button = document.createElement("button");
-
         button.className = "theme-button";
         button.dataset.theme = key;
-
         button.innerHTML = `
           <span class="theme-icon">${theme.icon}</span>
           <span>
@@ -1001,7 +880,6 @@
           </span>
           <span class="upgrade-cost"></span>
         `;
-
         button.addEventListener("click", () => buyOrSelectTheme(key));
         list.appendChild(button);
       }
@@ -1024,7 +902,6 @@
         const upgrade = state.upgrades[button.dataset.upgrade];
         const costModifier = getUpgradeCostModifier();
         const cost = Math.floor(upgrade.cost * costModifier);
-
         button.disabled = state.cookies < cost;
         button.querySelector(".upgrade-cost").textContent = formatNumber(cost);
 
@@ -1032,11 +909,7 @@
         ownedBadge.textContent = formatNumber(upgrade.owned);
 
         let effect = "";
-
-        if (upgrade.clickPower > 0) {
-          effect += `+${formatNumber(upgrade.clickPower)} per click`;
-        }
-
+        if (upgrade.clickPower > 0) effect += `+${formatNumber(upgrade.clickPower)} per click`;
         if (upgrade.cps > 0) {
           if (effect) effect += " and ";
           effect += `+${formatNumber(upgrade.cps)} CPS`;
@@ -1048,9 +921,8 @@
       document.querySelectorAll(".permanent-upgrade").forEach(button => {
         const upgrade = state.permanentUpgrades[button.dataset.permanent];
         const cost = upgrade.cost;
-
-        button.disabled = state.prestigeMultiplier < cost || upgrade.owned > 0;
-        button.querySelector(".permanent-cost").textContent = upgrade.owned > 0 ? "Unlocked" : `${cost.toFixed(1)}⭐`;
+        button.disabled = state.prestigeMultiplier < cost + 1.0 || upgrade.owned > 0;
+        button.querySelector(".permanent-cost").textContent = upgrade.owned > 0 ? "Unlocked" : `${cost.toFixed(1)}×`;
       });
 
       document.querySelectorAll(".theme-button").forEach(button => {
@@ -1058,7 +930,6 @@
         const theme = themes[key];
         const owned = state.purchasedThemes.includes(key);
         const selected = state.currentTheme === key;
-
         button.disabled = !owned && state.cookies < theme.cost;
 
         button.querySelector(".upgrade-info").textContent = selected
@@ -1073,12 +944,10 @@
 
     function createFloatingNumber(amount, x, y) {
       const floating = document.createElement("span");
-
       floating.className = "floating-number";
       floating.textContent = `+${formatNumber(amount)}`;
       floating.style.left = `${x}px`;
       floating.style.top = `${y}px`;
-
       document.querySelector("#cookieWrap").appendChild(floating);
       setTimeout(() => floating.remove(), 900);
     }
@@ -1087,7 +956,6 @@
       const upgrade = state.upgrades[key];
       const costModifier = getUpgradeCostModifier();
       const cost = Math.floor(upgrade.cost * costModifier);
-
       if (state.cookies < cost) return;
 
       state.cookies -= cost;
@@ -1103,7 +971,8 @@
       const upgrade = state.permanentUpgrades[key];
       const cost = upgrade.cost;
 
-      if (state.prestigeMultiplier < cost || upgrade.owned > 0) return;
+      if (upgrade.owned > 0) return;
+      if (state.prestigeMultiplier < cost + 1.0) return;
 
       state.prestigeMultiplier = Math.max(1.0, state.prestigeMultiplier - cost);
       upgrade.owned += 1;
@@ -1115,7 +984,6 @@
 
     function buyOrSelectTheme(key) {
       const theme = themes[key];
-
       if (state.purchasedThemes.includes(key)) {
         state.currentTheme = key;
         applyTheme();
@@ -1129,7 +997,6 @@
       state.cookies -= theme.cost;
       state.purchasedThemes.push(key);
       state.currentTheme = key;
-
       applyTheme();
       playUpgradeSound();
       render();
@@ -1139,30 +1006,23 @@
     function getWager() {
       const input = document.querySelector("#wagerAmount");
       const wager = Math.floor(Number(input.value));
-
-      if (!Number.isFinite(wager) || wager < 1) {
-        return 0;
-      }
-
+      if (!Number.isFinite(wager) || wager < 1) return 0;
       return wager;
     }
 
     function playCasinoGame(multiplier, winChance) {
       const wager = getWager();
       const result = document.querySelector("#casinoResult");
-
       if (wager < 1) {
         result.textContent = "Enter a valid wager first.";
         return;
       }
-
       if (state.cookies < wager) {
         result.textContent = "Not enough cookies for this wager.";
         return;
       }
 
       state.cookies -= wager;
-
       const won = Math.random() < winChance;
 
       if (won) {
@@ -1195,9 +1055,7 @@
     }
 
     function resetGame() {
-      if (!confirm("Are you sure? This will reset EVERYTHING. Permanent upgrades will be kept.")) {
-        return;
-      }
+      if (!confirm("Are you sure? This will reset EVERYTHING. Permanent upgrades will be kept.")) return;
 
       state.cookies = 0;
       state.totalBaked = 0;
@@ -1231,18 +1089,9 @@
       render();
     });
 
-    document.querySelector("#doubleGame").addEventListener("click", () => {
-      playCasinoGame(2, 0.5);
-    });
-
-    document.querySelector("#tenXGame").addEventListener("click", () => {
-      playCasinoGame(10, 0.1);
-    });
-
-    document.querySelector("#hundredXGame").addEventListener("click", () => {
-      playCasinoGame(100, 0.01);
-    });
-
+    document.querySelector("#doubleGame").addEventListener("click", () => playCasinoGame(2, 0.5));
+    document.querySelector("#tenXGame").addEventListener("click", () => playCasinoGame(10, 0.1));
+    document.querySelector("#hundredXGame").addEventListener("click", () => playCasinoGame(100, 0.01));
     document.querySelector("#prestige").addEventListener("click", prestige);
     document.querySelector("#reset").addEventListener("click", resetGame);
 
@@ -1260,5 +1109,4 @@
     render();
   </script>
 </body>
-
 </html>
